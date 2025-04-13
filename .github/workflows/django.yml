@@ -10,16 +10,12 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        python-version: [3.7, 3.8, 3.9]  # Ensure these Python versions exist and are compatible
-
     steps:
-    - uses: actions/checkout@v4  # Check if v4 works, if not, try v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2  # Using @v2 for stable compatibility
+    - uses: actions/checkout@v4
+    - name: Set up Python 3.8  # Use 3.8 instead of 3.7 if 3.7 is problematic
+      uses: actions/setup-python@v3  # Reverting back to @v3 for more stability
       with:
-        python-version: ${{ matrix.python-version }}
+        python-version: 3.8
         
     - name: Install Dependencies
       run: |
