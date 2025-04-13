@@ -24,20 +24,20 @@
                 method: "POST",
                 body: formData,
             })
-                .then(response => {
+                .then((response) => {
                     if (!response.ok) {
-                        return response.json().then(err => {
-                            throw new Error(err.error || "Unknown error occurred.");
+                        return response.json().then((err) => {
+                            throw new Error(err.error || "Unknown server error.");
                         });
                     }
                     return response.json();
                 })
-                .then(data => {
+                .then((data) => {
                     steps = data.steps;
                     currentStep = 0;
                     showNextStep();
                 })
-                .catch(error => {
+                .catch((error) => {
                     console.error("Error:", error.message);
                     alert(`Error: ${error.message}`);
                 })
