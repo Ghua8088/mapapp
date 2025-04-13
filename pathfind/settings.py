@@ -25,8 +25,7 @@ SECRET_KEY = 'django-insecure-t*e=qfo$lep45$^-1t6jx0nx+#yk!30mla_!pvua$_7ewr6c8%
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', '[::1]', 'mapapp-n1nz.onrender.com']
 
 # Application definition
 
