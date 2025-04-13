@@ -1,4 +1,6 @@
 import matplotlib
+import logging
+logger = logging.getLogger(__name__)
 matplotlib.use('Agg')     
 import matplotlib.pyplot as plt
 import io
@@ -22,14 +24,14 @@ def pathfind(request):
             start_y = int(request.POST.get("start_y", 0))
             end_x = int(request.POST.get("end_x", rows - 1))
             end_y = int(request.POST.get("end_y", cols - 1))
-            algorithm = request.POST.get("algorithm", "A*")  # Get the selected algorithm
+            algorithm = request.POST.get("algorithm", "A*") 
             slow = request.POST.get("slow", "false").lower() == "true" 
             map_path = MapPath(rows, cols, density=density,slow=slow)
-            # Pass the algorithm to the route method
             steps = map_path.route((start_x, start_y), (end_x, end_y), method=algorithm)
             return JsonResponse({"steps": steps})
         return render(request, "visualization.html")
-    except BrokenPipeError:
+    except Exception as e:
+        logger.error("Error occurred: %s", str(e))
         return HttpResponseServerError("Client disconnected unexpectedly.")
 
 
