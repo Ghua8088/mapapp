@@ -26,16 +26,13 @@ def pathfind(request):
             start_y = int(request.POST.get("start_y", 0))
             end_x = int(request.POST.get("end_x", rows - 1))
             end_y = int(request.POST.get("end_y", cols - 1))
-            algorithm = request.POST.get("algorithm", "A*")  # Get the selected algorithm
-            slow = request.POST.get("slow", "false").lower() == "true"
-            map_path = MapPath(rows, cols, density=density, slow=slow)
+            algorithm = request.POST.get("algorithm", "A*") 
+            map_path = MapPath(rows, cols, density=density)
             steps = map_path.route((start_x, start_y), (end_x, end_y), method=algorithm)
-            return JsonResponse({"steps": steps})
+            return JsonResponse({"steps": steps}) 
         return render(request, "visualization.html")
     except ValueError as e:
         return JsonResponse({"error": f"Invalid input: {str(e)}"}, status=400)
-    except BrokenPipeError:
-        return JsonResponse({"error": "Client disconnected unexpectedly."}, status=500)
     except Exception as e:
         return JsonResponse({"error": f"An unexpected error occurred: {str(e)}"}, status=500)
 
