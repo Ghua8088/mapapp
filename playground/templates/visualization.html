@@ -14,7 +14,7 @@
             const gridContainer = document.getElementById("grid");
             const rows = parseInt(document.getElementById("rows").value);
             const cols = parseInt(document.getElementById("cols").value);
-            if(1>cols>50 && 1>rows>50){
+            if(1>cols|| cols>50 || 1>rows||rows>50){
                 alert("Please enter a valid number of rows and columns (1-50).");
                 return;
             }
