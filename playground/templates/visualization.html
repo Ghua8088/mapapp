@@ -14,6 +14,10 @@
             const gridContainer = document.getElementById("grid");
             const rows = parseInt(document.getElementById("rows").value);
             const cols = parseInt(document.getElementById("cols").value);
+            if(1>cols>50 && 1>rows>50){
+                alert("Please enter a valid number of rows and columns (1-50).");
+                return;
+            }
             gridContainer.innerHTML = "";
             const cellSize = Math.min(400 / cols, 400 / rows); 
             for (let i = 0; i < rows; i++) {
@@ -133,11 +137,11 @@
             <form method="post" class="w-full max-w-sm space-y-4">
                 {% csrf_token %}
                 <div class="flex flex-col">
-                    <label for="rows" class="text-sm">Rows:</label>
+                    <label for="rows" class="text-sm">Rows(1-50):</label>
                     <input type="number" name="rows" id="rows" value="10" class="w-full p-2 rounded bg-gray-700 text-white" required>
                 </div>
                 <div class="flex flex-col">
-                    <label for="cols" class="text-sm">Columns:</label>
+                    <label for="cols" class="text-sm">Columns(1-50):</label>
                     <input type="number" name="cols" id="cols" value="10" class="w-full p-2 rounded bg-gray-700 text-white" required>
                 </div>
                 <div class="flex flex-col">
