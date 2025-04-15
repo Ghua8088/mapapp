@@ -82,7 +82,6 @@
                         const cell = gridContainer.children[i].children[j];
                         const cellStatus = gridData[i][j];
                         let colorClass = "";  
-
                         switch (cellStatus) {
                             case -1:  
                                 colorClass = "bg-black";
@@ -111,9 +110,8 @@
                         }
                     }
                 }
-
                 currentStep++;
-                setTimeout(updateGrid,100);  
+                setTimeout(updateGrid,1000/steps.length); 
             }
         }
 
