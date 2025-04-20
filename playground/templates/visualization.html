@@ -14,20 +14,23 @@
             const gridContainer = document.getElementById("grid");
             const rows = parseInt(document.getElementById("rows").value);
             const cols = parseInt(document.getElementById("cols").value);
-            if(1>cols|| cols>50 || 1>rows||rows>50){
+
+            if (rows < 1 || rows > 50 || cols < 1 || cols > 50) {
                 alert("Please enter a valid number of rows and columns (1-50).");
                 return;
             }
+
             gridContainer.innerHTML = "";
-            const cellSize = Math.min(400 / cols, 400 / rows); 
+            const cellSize = Math.min(400 / cols, 400 / rows);
+
             for (let i = 0; i < rows; i++) {
                 const rowDiv = document.createElement("div");
                 rowDiv.classList.add("flex");
                 for (let j = 0; j < cols; j++) {
                     const cellDiv = document.createElement("div");
-                    cellDiv.classList.add("grid_cell","border", "border-gray-700", "visibility-hidden"); 
+                    cellDiv.classList.add("grid_cell", "border", "border-gray-700");
                     cellDiv.style.width = `${cellSize}px`;
-                    cellDiv.style.height = `${cellSize}px`; 
+                    cellDiv.style.height = `${cellSize}px`;
                     rowDiv.appendChild(cellDiv);
                 }
                 gridContainer.appendChild(rowDiv);
@@ -35,152 +38,163 @@
         }
 
         function visualizePath() {
-            const visualizeButton = document.querySelector("button[type='button']");
             if (inprogress) {
                 alert("Please wait for the current visualization to finish.");
                 return;
             }
-            inprogress = true;
-            visualizeButton.disabled = true;
-            visualizeButton.classList.add("opacity-50", "cursor-not-allowed");
 
+            inprogress = true;
             const formData = new FormData(document.querySelector("form"));
             fetch("{% url 'pathfind' %}", {
                 method: "POST",
                 body: formData,
             })
-                .then((response) => {
-                    if (!response.ok) {
-                        return response.json().then((err) => {
-                            throw new Error(err.error || "Unknown server error.");
-                        });
-                    }
-                    return response.json();
-                })
-                .then((data) => {
+                .then(response => response.json())
+                .then(data => {
                     steps = data.steps;
                     currentStep = 0;
-                    createGrid();   
-                    updateGrid();   
+                    createGrid();
+                    updateGrid();
                 })
-                .catch((error) => {
+                .catch(error => {
                     console.error("Error:", error.message);
                     alert(`Error: ${error.message}`);
                 })
                 .finally(() => {
                     inprogress = false;
-                    visualizeButton.disabled = false;
-                    visualizeButton.classList.remove("opacity-50", "cursor-not-allowed");
                 });
         }
 
         function updateGrid() {
             if (currentStep < steps.length) {
                 const gridContainer = document.getElementById("grid");
-                const gridData = steps[currentStep];
                 const rows = parseInt(document.getElementById("rows").value);
                 const cols = parseInt(document.getElementById("cols").value);
 
                 for (let i = 0; i < rows; i++) {
                     for (let j = 0; j < cols; j++) {
                         const cell = gridContainer.children[i].children[j];
-                        const cellStatus = gridData[i][j];
-                        let colorClass = "";  
-                        switch (cellStatus) {
-                            case -1:  
-                                colorClass = "bg-black";
-                                break;
-                            case 0:  
-                                colorClass = "bg-gray-200";
-                                break;
-                            case 1:  
-                                colorClass = "bg-blue-500";
-                                break;
-                            case 2:  
-                                colorClass = "bg-yellow-500";
-                                break;
-                            case 3:  
-                                colorClass = "bg-red-500";
-                                break;
-                            case 4:  
-                                colorClass = "bg-green-500";
-                                break;
-                            default:
-                                colorClass = "";  
-                        } 
-                        if (colorClass) {
-                            cell.classList.remove("visibility-hidden");  
-                            cell.classList.add(colorClass);  
-                        }
+                        const cellStatus = steps[currentStep][i][j];
+                        cell.className = "grid_cell border border-gray-700";
+
+                        if (cellStatus === -1) cell.classList.add("bg-black");
+                        else if (cellStatus === 0) cell.classList.add("bg-gray-200");
+                        else if (cellStatus === 1) cell.classList.add("bg-blue-500");
+                        else if (cellStatus === 2) cell.classList.add("bg-yellow-500");
+                        else if (cellStatus === 3) cell.classList.add("bg-red-500");
+                        else if (cellStatus === 4) cell.classList.add("bg-green-500");
                     }
                 }
+
                 currentStep++;
-                setTimeout(updateGrid,1000/steps.length); 
+                setTimeout(updateGrid,1000/steps.length);
             }
         }
-
     </script>
     <style>
         .grid_cell {
-            transition: background-color 0.3s ease, visibility 0.3s ease;  
-            border-radius: 2px;
+            transition: background-color 0.3s ease;
         }
+        @keyframes bounce {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(15px);
+            }
+        }
+        .arrow{
+            text-align: center;
+            position: absolute;
+            bottom: 50px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 100;
+            animation: bounce 1.5s ease-in-out infinite;
+        }
+        .arrow p{
+            font-size:80px;
+            color: white;
+        }
+        
     </style>
 </head>
-<body class="bg-gray-900 text-white h-screen flex flex-col">
-    <header class="bg-gray-800 py-4 shadow-lg">
-        <h4 class="text-center text-2xl font-bold">Graph Algorithm Visualization</h4>
+<body class="bg-gray-900 text-white min-h-screen flex flex-col">
+    <header class="relative bg-gradient-to-r from-blue-600 to-purple-800 h-screen flex items-center justify-center">
+        <div class="text-center px-4 animate-fade-in">
+            <h1 class="text-5xl md:text-6xl font-extrabold text-white drop-shadow-lg">
+                Graph Algorithm Visualizer
+            </h1>
+            <p class="mt-4 text-lg md:text-xl text-gray-200 max-w-3xl mx-auto">
+                Discover how popular pathfinding and graph traversal algorithms work visually.
+                Learn, experiment, and gain a deeper understanding of algorithms like A*, BFS, DFS, and Dijkstra!
+            </p>
+            <div class="arrow">
+                <p>⇓</p>
+            </div>
+        </div>
     </header>
-    <main class="flex flex-row h-full">
-          
-        <section class="w-1/3 bg-gray-800 p-4 flex flex-col items-center">
-            <form method="post" class="w-full max-w-sm space-y-4">
+
+    <main class="flex flex-col md:flex-row flex-1">
+        <!-- Form Section -->
+        <section class="w-full md:w-1/3 bg-gray-800 p-4 flex flex-col items-center">
+            <form class="w-full max-w-md space-y-4">
                 {% csrf_token %}
                 <div class="flex flex-col">
-                    <label for="rows" class="text-sm">Rows(1-50):</label>
-                    <input type="number" name="rows" id="rows" value="10" class="w-full p-2 rounded bg-gray-700 text-white" required>
+                    <label for="rows" class="text-sm mb-1">Rows (1-50):</label>
+                    <input type="number" id="rows" name="rows" value="10" class="p-2 rounded bg-gray-700 text-white" required>
                 </div>
+
                 <div class="flex flex-col">
-                    <label for="cols" class="text-sm">Columns(1-50):</label>
-                    <input type="number" name="cols" id="cols" value="10" class="w-full p-2 rounded bg-gray-700 text-white" required>
+                    <label for="cols" class="text-sm mb-1">Columns (1-50):</label>
+                    <input type="number" id="cols" name="cols" value="10" class="p-2 rounded bg-gray-700 text-white" required>
                 </div>
+
                 <div class="flex flex-col">
-                    <label for="density" class="text-sm">Density (0-1):</label>
-                    <input type="number" step="0.01" name="density" id="density" value="0.3" class="w-full p-2 rounded bg-gray-700 text-white" required>
+                    <label for="density" class="text-sm mb-1">Density (0-1):</label>
+                    <input type="number" step="0.01" id="density" name="density" value="0.3" class="p-2 rounded bg-gray-700 text-white" required>
                 </div>
-                <div class="flex flex-col">
-                    <label for="start_x" class="text-sm">Start X:</label>
-                    <input type="number" name="start_x" id="start_x" value="0" class="w-full p-2 rounded bg-gray-700 text-white" required>
+
+                <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:justify-between">
+                    <div class="w-full md:w-1/2">
+                        <label for="start_x" class="text-sm mb-1">Start X:</label>
+                        <input type="number" id="start_x" name="start_x" value="0" class="w-full p-2 rounded bg-gray-700 text-white" required>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <label for="start_y" class="text-sm mb-1">Start Y:</label>
+                        <input type="number" id="start_y" name="start_y" value="0" class="w-full p-2 rounded bg-gray-700 text-white" required>
+                    </div>
                 </div>
-                <div class="flex flex-col">
-                    <label for="start_y" class="text-sm">Start Y:</label>
-                    <input type="number" name="start_y" id="start_y" value="0" class="w-full p-2 rounded bg-gray-700 text-white" required>
+
+                <div class="flex flex-col space-y-2 md:space-y-0 md:flex-row md:justify-between">
+                    <div class="w-full md:w-1/2">
+                        <label for="end_x" class="text-sm mb-1">End X:</label>
+                        <input type="number" id="end_x" name="end_x" value="9" class="w-full p-2 rounded bg-gray-700 text-white" required>
+                    </div>
+                    <div class="w-full md:w-1/2">
+                        <label for="end_y" class="text-sm mb-1">End Y:</label>
+                        <input type="number" id="end_y" name="end_y" value="9" class="w-full p-2 rounded bg-gray-700 text-white" required>
+                    </div>
                 </div>
+
                 <div class="flex flex-col">
-                    <label for="end_x" class="text-sm">End X:</label>
-                    <input type="number" name="end_x" id="end_x" value="9" class="w-full p-2 rounded bg-gray-700 text-white" required>
-                </div>
-                <div class="flex flex-col">
-                    <label for="end_y" class="text-sm">End Y:</label>
-                    <input type="number" name="end_y" id="end_y" value="9" class="w-full p-2 rounded bg-gray-700 text-white" required>
-                </div>
-                <div class="flex flex-col">
-                    <label for="algorithm" class="text-sm">Algorithm:</label>
-                    <select name="algorithm" id="algorithm" class="w-full p-2 rounded bg-gray-700 text-white">
+                    <label for="algorithm" class="text-sm mb-1">Algorithm:</label>
+                    <select id="algorithm" name="algorithm" class="p-2 rounded bg-gray-700 text-white">
                         <option value="A*">A*</option>
                         <option value="BFS">BFS</option>
                         <option value="DFS">DFS</option>
                         <option value="Dijkstra">Dijkstra</option>
                     </select>
                 </div>
+
                 <button type="button" onclick="visualizePath()" class="w-full py-2 bg-blue-600 hover:bg-blue-500 rounded">
                     Visualize Path
                 </button>
             </form>
         </section>
 
-          
-        <section class="w-2/3 bg-black flex items-center justify-center p-4">
+        <!-- Grid Section -->
+        <section class="w-full md:w-2/3 bg-gray-900 p-4 flex items-center justify-center">
             <div id="grid" class="flex flex-col space-y-1"></div>
         </section>
     </main>
